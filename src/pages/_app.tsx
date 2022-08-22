@@ -3,10 +3,12 @@ import { AppRouter } from '../server/routers/appRouter'
 import React from 'react'
 import Index from '.';
 import '../styles/globals.css'
+import { Context } from '../server/context';
 
-const App = () => {
+const App = (ctx:Context) => {
   return (
-    <Index/>
+    <Index
+    ctx={ctx}/>
   );
 }
 

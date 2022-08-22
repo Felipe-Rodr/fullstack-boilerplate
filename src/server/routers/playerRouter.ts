@@ -21,7 +21,6 @@ export const playerRouter = createRouter()
                     res: ctx.res,
                     maxAge:60*6*24
                 });
-                console.log(ctx.req.cookies.qid)
                 return 1;
             } catch {
                 return 0;
@@ -43,6 +42,21 @@ export const playerRouter = createRouter()
                     res: ctx.res
                 })
                 return 1;
+            } catch {
+                return 0;
+            }
+        }
+    })
+    .query('getPlayerById', {
+        input: z.object({
+            id: z.number().default(0)
+        }),
+        async resolve({ctx, input}){
+            try{
+                const Player = await ctx.prisma.player.findUnique({
+                    where:input
+                });
+                return Player;
             } catch {
                 return 0;
             }
