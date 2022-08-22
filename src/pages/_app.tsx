@@ -5,10 +5,9 @@ import Index from '.';
 import '../styles/globals.css'
 import { Context } from '../server/context';
 
-const App = (ctx:Context) => {
+const App = () => {
   return (
-    <Index
-    ctx={ctx}/>
+    <Index/>
   );
 }
 
