@@ -19,7 +19,9 @@ export const playerRouter = createRouter()
                 setCookie('qid', player.id,{
                     req: ctx.req,
                     res: ctx.res,
-                    maxAge:60*6*24
+                    maxAge:60*6*24,
+                    sameSite:'none',
+                    secure:true
                 });
                 return 1;
             } catch {
@@ -28,7 +30,7 @@ export const playerRouter = createRouter()
             
         },
     })
-    .mutation('deletePlayerById',{
+    .mutation('deletePlayer',{
         input: z.object({
             id: z.number()
         }),
