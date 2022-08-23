@@ -1,20 +1,32 @@
 import { getCookie, hasCookie } from 'cookies-next';
 import React, { useEffect, useState } from 'react'
-import { setTimeout } from 'timers';
-import { Context } from '../server/context';
 import { trpc } from '../utils/trpc'
 
-
 interface IndexProps {
-  
+
 }
 
 const Index = ({}:IndexProps) => {
+  const [UserID, setUserID] = useState(0)
   const [DeleteMessage, setDeleteMessage] = useState('')
   const [AddMessage, setAddMessage] = useState('')
-  const addPlayer = trpc.useMutation('player.addPlayer')
-  const deletePlayer = trpc.useMutation('player.deletePlayer')
-  const Player = trpc.useQuery(['player.getPlayerById', {id:Number(getCookie('qid') ?? 0)}])
+  useEffect(() => {
+    setUserID(Number(getCookie('qid') ?? 0))
+  }, [])
+  const utils = trpc.useContext();
+  const Player = trpc.useQuery(['player.getPlayerById', {id:UserID}])
+  const addPlayer = trpc.useMutation('player.addPlayer',{
+    onSuccess: () => {
+      setUserID(Number(getCookie('qid')))
+      utils.invalidateQueries(['player.getPlayerById'])
+    }
+  })
+  const deletePlayer = trpc.useMutation('player.deletePlayer',{
+    onSuccess: () => {
+      setUserID(0)
+      utils.invalidateQueries(['player.getPlayerById'])
+    }
+  })
   const handleClick = {
     CriarPlayer : async (e:React.MouseEvent<HTMLButtonElement,MouseEvent>) => {
       try{
@@ -22,7 +34,6 @@ const Index = ({}:IndexProps) => {
           onSuccess: (data) => {
             if(data){
               setAddMessage('Player criado com sucesso.');
-              Player.refetch();
             } else {
               setAddMessage('Player não foi criado');
             }
@@ -41,9 +52,7 @@ const Index = ({}:IndexProps) => {
             onSuccess: (data) => {
               if(data){
                 setDeleteMessage('Player deletado com sucesso.');
-                
                 setAddMessage('');
-                Player.refetch();
               } else {
                 setDeleteMessage('Player não foi encontrado.');
               }
@@ -59,7 +68,7 @@ const Index = ({}:IndexProps) => {
       <div className='w-full h-full flex flex-col items-center'>
         <div className='w-fit h-fit flex flex-col items-center p-2 m-3 border'>
           {Player.isLoading && (
-            <p>Loading...</p>
+            <div>Loading...</div>
           )}
           {!Player.isLoading && (
             <>
@@ -78,7 +87,7 @@ const Index = ({}:IndexProps) => {
     <div className='w-full h-full flex flex-col items-center'>
       <div className='w-fit h-fit flex flex-col items-center p-2 m-3 border'>
         {Player.isLoading && (
-          <p>Loading...</p>
+          <div>Loading...</div>
         )}
         {!Player.isLoading && (
           <>
